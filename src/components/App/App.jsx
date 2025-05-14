@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react'
 import SearchBar from '../SearchBar/SearchBar'
 import ImageGallery from "../ImageGallery/ImageGallery"
 import Loader from '../Loader/Loader'
-import Modal from 'react-modal';
 import css from "./App.module.css"
 import ErrorMessage from "../ErrorMessage/ErrorMessage"
 import LoadMoreBtn from "../LoadMoreBtn/LoadMoreBtn"
 import { fetchData } from '../../fetchData';
+import ImageModal from '../ImageModal/ImageModal'
 
-Modal.setAppElement('#root');
+
 
 function App() {
   const [searchVal, setSearchVal] = useState("")
@@ -40,6 +40,11 @@ function App() {
     setCurentPage(curentPage + 1);
   }
 
+  const onImageClick = (picture) => {
+    setModalPhoto(picture);
+    openModal();
+  }
+
   useEffect(() => {
     if (searchVal === '') {
       return;
@@ -63,16 +68,9 @@ function App() {
   return (
     <div className={css.block}>
       <SearchBar handler={handleSearch} />
-      {photos.length>0 && errorMes=="" ? <ImageGallery pictureList={photos} setModal={setModalPhoto} openModal={openModal} /> : <ErrorMessage error={errorMes} />}
+      {photos.length>0 && errorMes=="" ? <ImageGallery pictureList={photos} onImageClick={onImageClick}/> : <ErrorMessage error={errorMes} />}
       <Loader loading={isLoading} />
-      {modalPhoto != undefined && <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        className={css.Modal}
-        overlayClassName={css.Overlay}
-      >
-        <img src={modalPhoto.urls.regular} alt={modalPhoto.alt_description} className={css.img } />
-      </Modal>}
+      {modalPhoto != undefined && <ImageModal modalIsOpen={modalIsOpen} closeModal={closeModal} modalPhoto={modalPhoto } />}
       {maxPages>0 && curentPage<maxPages && errorMes=="" && <LoadMoreBtn clickHandle={ inreasePage } /> }
     </div>
   )
